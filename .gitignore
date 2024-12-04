@@ -1,6 +1,7 @@
-venv/
-*.pyc
-__pycache__/*
-databases/*
-!databases/README.md
-.service/
+venv/                                   # Ignore the virtual environment
+*.pyc                                   # Ignore compiled python files
+__pycache__/*                           # Ignore python bytecode cache
+bird_watching_app/databases/*           # Ignore everything in the databases folder
+!bird_watching_app/databases/README.md  # But include the README file           
+.service/                               # Ignore .service files
+.DS_Store                               # Ignore macOS system files
