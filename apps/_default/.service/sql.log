@@ -1,4 +1,4 @@
-timestamp: 2024-12-03T23:00:47.760804
+timestamp: 2024-12-03T22:53:16.008886
 CREATE TABLE "py4web_error"(
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "uuid" CHAR(512),
