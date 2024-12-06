@@ -20,4 +20,26 @@ def get_time():
 #
 ## always commit your models to avoid problems later
 
+db.define_table(
+    'species',
+    Field('common_name', 'string')
+)
+
+db.define_table(
+    'sightings',
+    Field('sampling_event_identifier', 'string'),
+    Field('common_name', 'string'),
+    Field('observation_count', 'integer')
+)
+
+db.define_table(
+    'checklists',
+    Field('sampling_event_identifier', 'string'),
+    Field('latitude', 'double'),
+    Field('observation_date', 'date'),
+    Field('time_observations_started', 'time'),
+    Field('observer_id', 'string'),
+    Field('duration_minutes', 'integer'),
+)
+
 db.commit()
