@@ -33,12 +33,13 @@ from .models import get_user_email
 
 url_signer = URLSigner(session)
 
-@action('index')
+@action('index', method=['GET'])
 @action.uses('index.html', db, auth, url_signer)
 def index():
+    if not auth.current_user:
+        redirect(URL('auth/login'))
     return dict(
-        # COMPLETE: return here any signed URLs you need.
-        my_callback_url = URL('my_callback', signer=url_signer),
+        my_callback_url=URL('my_callback', signer=url_signer),
     )
 
 @action('my_callback')
@@ -46,3 +47,10 @@ def index():
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
+
+# Stats page enables users to see stats and compilations about their own data.
+# Users should be able to see their own stats 
+    # A list of all species they have seen
+        # searchable
+    # When they click on a spcies, should be able to see some kind of visualization of when they saw it/also where
+    # Visualization of how their bird-watching has trended in time.
