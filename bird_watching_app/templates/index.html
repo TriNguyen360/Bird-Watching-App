@@ -8,6 +8,23 @@
 
 
 <div class="section" id="app" v-cloak>
+  <!-- Navigation Menu -->
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="[[=URL('stats')]]">
+          My Stats
+        </a>
+        <a class="navbar-item" href="[[=URL('checklist')]]">
+          Submit a Checklist
+        </a>
+        <a class="navbar-item" href="[[=URL('location')]]">
+          Explore Locations
+        </a>
+      </div>
+    </div>
+  </nav>
+
   <!-- Put here your Vue.js template -->
   <h1 class="title"><i class="fa-solid fa-cube"></i> Title</h1>
   <p>Content: my_value: {{my_value}} </p>
