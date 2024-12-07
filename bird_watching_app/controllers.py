@@ -48,6 +48,21 @@ def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
 
+@action('stats', method=['GET'])
+@action.uses('stats.html', auth.user)
+def stats():
+    return dict()
+
+@action('checklist', method=['GET'])
+@action.uses('checklist.html', auth.user)
+def checklist():
+    return dict()
+
+@action('location', method=['GET'])
+@action.uses('location.html', auth.user)
+def location():
+    return dict()
+
 # Stats page enables users to see stats and compilations about their own data.
 # Users should be able to see their own stats 
     # A list of all species they have seen
