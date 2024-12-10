@@ -63,9 +63,48 @@ def checklist():
 def location():
     return dict()
 
-# Stats page enables users to see stats and compilations about their own data.
-# Users should be able to see their own stats 
-    # A list of all species they have seen
-        # searchable
-    # When they click on a spcies, should be able to see some kind of visualization of when they saw it/also where
-    # Visualization of how their bird-watching has trended in time.
+@action('heatmap_data', method=['GET'])
+@action.uses(db, auth.user)
+def heatmap_data():
+    points = []
+    rows = db(db.sightings).select(
+        db.sightings.observation_count,
+        db.checklists.latitude,
+        db.checklists.longitude,
+        join=db.sightings.on(
+            db.sightings.sampling_event_identifier == db.checklists.sampling_event_identifier
+        ),
+    )
+
+    for row in rows:
+        points.append([row.checklists.latitude, row.checklists.longitude, row.sightings.observation_count])
+
+    return dict(points=points)
+
+
+@action('region_stats', method=['POST'])
+@action.uses(db, auth.user)
+def region_stats():
+    data = request.json
+    ne_lat = data.get('ne_lat')
+    ne_lng = data.get('ne_lng')
+    sw_lat = data.get('sw_lat')
+    sw_lng = data.get('sw_lng')
+
+    rows = db(
+        (db.checklists.latitude <= ne_lat) &
+        (db.checklists.latitude >= sw_lat) &
+        (db.checklists.longitude <= ne_lng) &
+        (db.checklists.longitude >= sw_lng)
+    ).select(db.sightings.common_name, db.sightings.observation_count, db.checklists.ALL, 
+             join=db.sightings.on(db.sightings.sampling_event_identifier == db.checklists.sampling_event_identifier))
+
+    species_stats = {}
+    for row in rows:
+        species = row.sightings.common_name
+        count = row.sightings.observation_count
+        if species not in species_stats:
+            species_stats[species] = 0
+        species_stats[species] += count
+
+    return dict(stats=species_stats)
