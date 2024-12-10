@@ -1,16 +1,36 @@
 [[extend 'layout.html']]
 
-<!-- Include Bootstrap CSS if not already included in layout.html -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Optional: Include Bootstrap Icons for better visuals -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- Custom Styles -->
 <style>
   body {
-    background-color: #f4f9f4; /* Light greenish background */
+    background-color: #f4f9f4;
   }
 
+  /* Button Styling */
+  .header-buttons .btn {
+    background-color: #4caf50; /* Green button background */
+    color: white;
+    margin: 0 5px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .header-buttons .btn:hover {
+    background-color: #81c784; /* Lighter green on hover */
+    transform: scale(1.05); /* Slight enlargement on hover */
+    color: white;
+  }
+
+  .header-buttons .btn:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Additional Styling */
   .card {
     border: none;
     border-radius: 15px;
@@ -23,7 +43,7 @@
   }
 
   .card-header {
-    background-color: #4caf50; /* Green header */
+    background-color: #4caf50;
     color: white;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
@@ -35,11 +55,11 @@
   }
 
   .list-group-item:hover {
-    background-color: #e8f5e9; /* Light green hover */
+    background-color: #e8f5e9;
   }
 
   .list-group-item.active {
-    background-color: #81c784; /* Darker green for active */
+    background-color: #81c784;
     border-color: #81c784;
     color: white;
   }
@@ -47,29 +67,6 @@
   .search-input {
     border-radius: 50px;
     padding: 10px 20px;
-  }
-
-  #speciesMap {
-    border-radius: 15px;
-    overflow: hidden;
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 767px) {
-    #speciesMap {
-      height: 200px;
-    }
-  }
-
-  /* Additional Spacing */
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title i {
-    font-size: 1.2rem;
   }
 </style>
 
@@ -79,19 +76,28 @@
     <div class="col text-center">
       <h1 class="display-4 text-success">My Birding Statistics</h1>
       <p class="lead text-muted">Track and analyze your bird-watching activities.</p>
+      <div class="header-buttons mt-3">
+        <a href="[[=URL('index')]]" class="btn btn-success">
+          My Stats
+        </a>
+        <a href="[[=URL('checklist')]]" class="btn btn-success">
+          Submit a Checklist
+        </a>
+        <a href="[[=URL('location')]]" class="btn btn-success">
+          Explore Locations
+        </a>
+      </div>
     </div>
   </div>
 
+  <!-- Page Content -->
   <div class="row">
-    <!-- Left Column: Species Observed and Bird-Watching Trends -->
     <div class="col-md-6 mb-4">
-      <!-- Species Observed -->
       <div class="card mb-4">
         <div class="card-header">
           <h5 class="card-title mb-0 section-title"><i class="bi bi-search"></i> Species Observed</h5>
         </div>
         <div class="card-body">
-          <!-- Search Bar -->
           <div class="mb-3">
             <input
               type="text"
@@ -101,7 +107,6 @@
               @input="filterSpecies"
             />
           </div>
-          <!-- Species List -->
           <ul class="list-group">
             <li
               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -117,7 +122,6 @@
         </div>
       </div>
 
-      <!-- Bird-Watching Trends -->
       <div class="card">
         <div class="card-header">
           <h5 class="card-title mb-0 section-title"><i class="bi bi-bar-chart-line"></i> Bird-Watching Trends</h5>
@@ -128,20 +132,16 @@
       </div>
     </div>
 
-    <!-- Right Column: Selected Species Details -->
     <div class="col-md-6 mb-4">
-      <!-- Selected Species Detail Visualization -->
       <div class="card" v-if="selectedSpecies">
         <div class="card-header">
           <h5 class="card-title mb-0 section-title"><i class="bi bi-tree"></i> {{ selectedSpecies.common_name }} Details</h5>
         </div>
         <div class="card-body">
-          <!-- Observations Over Time -->
           <div class="mb-4">
             <h6 class="text-success section-title"><i class="bi bi-calendar-check"></i> Observations Over Time</h6>
             <canvas id="speciesTrendChart"></canvas>
           </div>
-          <!-- Optional: Map for Locations -->
           <div>
             <h6 class="text-success section-title"><i class="bi bi-geo-alt-fill"></i> Observation Locations</h6>
             <div id="speciesMap" style="height: 300px;"></div>
@@ -153,17 +153,11 @@
 </div>
 
 [[block page_scripts]]
-<!-- Include Bootstrap JS and dependencies if not already included in layout.html -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Include Chart.js for visualizations -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Include Leaflet.js for maps -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-<!-- Include Vue.js if not already included -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-<!-- Include Bootstrap Icons -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
-<!-- Loads the stats-specific JS for Vue -->
 <script src="js/stats.js"></script>
 [[end]]
