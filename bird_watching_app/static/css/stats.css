@@ -1,0 +1,68 @@
+/* General body styling */
+body {
+    background-color: #f4f9f4;
+  }
+  
+  /* Header buttons styling */
+  .header-buttons .btn {
+    background-color: #4caf50;
+    color: white;
+    margin: 0 5px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .header-buttons .btn:hover {
+    background-color: #81c784;
+    transform: scale(1.05);
+    color: white;
+  }
+  
+  .header-buttons .btn:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Card styling */
+  .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .card-header {
+    background-color: #4caf50;
+    color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+  
+  /* List group styling */
+  .list-group-item {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .list-group-item:hover {
+    background-color: #e8f5e9;
+  }
+  
+  .list-group-item.active {
+    background-color: #81c784;
+    border-color: #81c784;
+    color: white;
+  }
+  
+  /* Search input styling */
+  .search-input {
+    border-radius: 50px;
+    padding: 10px 20px;
+  }
+  
