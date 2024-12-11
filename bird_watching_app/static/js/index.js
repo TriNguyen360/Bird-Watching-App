@@ -1,21 +1,15 @@
 "use strict";
 
-// This will be the object that will contain the Vue attributes
-// and be used to initialize it.
+// Vue.js app setup
 let app = {};
-
-
-app.data = {    
-    data: function() {
+app.data = {
+    data: function () {
         return {
-            // Complete as you see fit.
-            my_value: 1, // This is an example.
+            my_value: 1, // Example value
         };
     },
     methods: {
-        // Complete as you see fit.
-        my_function: function() {
-            // This is an example.
+        my_function: function () {
             this.my_value += 1;
         },
     },
@@ -23,14 +17,18 @@ app.data = {
 
 app.vue = Vue.createApp(app.data).mount("#app");
 
+// Map initialization logic
 app.init_map = function () {
+    // Default location
     const defaultLocation = { lat: 37.7749, lng: -122.4194 };
-    
+
+    // Create map
     app.map = new google.maps.Map(document.getElementById("map"), {
         center: defaultLocation,
         zoom: 10,
     });
 
+    // Geolocation
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -48,13 +46,15 @@ app.init_map = function () {
         console.error("Geolocation is not supported by this browser.");
     }
 
+    // Heatmap layer
     app.heatmap = new google.maps.visualization.HeatmapLayer({
         data: [],
         map: app.map,
     });
 
+    // Fetch heatmap data
     axios.get(my_callback_url).then((response) => {
-        let heatmapData = response.data.points.map((point) => {
+        const heatmapData = response.data.points.map((point) => {
             return {
                 location: new google.maps.LatLng(point[0], point[1]),
                 weight: point[2],
@@ -63,6 +63,7 @@ app.init_map = function () {
         app.heatmap.setData(heatmapData);
     });
 
+    // Drawing manager
     const drawingManager = new google.maps.drawing.DrawingManager({
         drawingControl: true,
         drawingControlOptions: {
@@ -72,11 +73,13 @@ app.init_map = function () {
     });
     drawingManager.setMap(app.map);
 
+    // Event listener for rectangle complete
     google.maps.event.addListener(drawingManager, "rectanglecomplete", function (rectangle) {
         const bounds = rectangle.getBounds();
         const ne = bounds.getNorthEast();
         const sw = bounds.getSouthWest();
 
+        // Send rectangle bounds to backend
         axios.post(my_callback_url, {
             ne_lat: ne.lat(),
             ne_lng: ne.lng(),
@@ -90,4 +93,7 @@ app.init_map = function () {
     });
 };
 
-app.init_map();
+// Global initMap function (called by Google Maps API)
+window.initMap = function () {
+    app.init_map();
+};
