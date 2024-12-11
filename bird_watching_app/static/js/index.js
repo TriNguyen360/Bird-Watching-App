@@ -46,21 +46,26 @@ app.init_map = function () {
         console.error("Geolocation is not supported by this browser.");
     }
 
-    // Heatmap layer
-    app.heatmap = new google.maps.visualization.HeatmapLayer({
+    // Create heatmap layer
+    const heatmap = new google.maps.visualization.HeatmapLayer({
         data: [],
-        map: app.map,
+        map: app.map
     });
 
-    // Fetch heatmap data
-    axios.get(my_callback_url).then((response) => {
-        const heatmapData = response.data.points.map((point) => {
+    // Fetch heatmap data from your backend
+    axios.get('/bird_watching_app/heatmap_data').then(response => {
+        // response.data.points should be [[lat, lng, weight], ...]
+        const points = response.data.points.map((p) => {
             return {
-                location: new google.maps.LatLng(point[0], point[1]),
-                weight: point[2],
+                location: new google.maps.LatLng(p[0], p[1]),
+                weight: p[2]
             };
         });
-        app.heatmap.setData(heatmapData);
+
+        // Update the heatmap data
+        heatmap.setData(points);
+    }).catch((error) => {
+        console.error("Error loading heatmap data:", error);
     });
 
     // Drawing manager
@@ -79,16 +84,20 @@ app.init_map = function () {
         const ne = bounds.getNorthEast();
         const sw = bounds.getSouthWest();
 
-        // Send rectangle bounds to backend
-        axios.post(my_callback_url, {
+        // Send rectangle bounds to the region_stats endpoint
+        axios.post('region_stats', {
             ne_lat: ne.lat(),
             ne_lng: ne.lng(),
             sw_lat: sw.lat(),
             sw_lng: sw.lng(),
         }).then((response) => {
             console.log("Region Stats:", response.data.stats);
+            // You might show these stats in your UI somehow.
+        }).catch((error) => {
+            console.error("Error fetching region stats:", error);
         });
 
+        // Remove the rectangle after fetching stats
         rectangle.setMap(null);
     });
 };
