@@ -49,9 +49,20 @@ def my_callback():
     return dict(my_value=3)
 
 @action('stats', method=['GET'])
-@action.uses('stats.html', auth.user)
+@action.uses('stats.html', db, auth, url_signer)
 def stats():
-    return dict()
+    # Example: Pass any required data to stats.html
+    return dict(
+        species_data_url=URL('get_species_data', signer=url_signer),
+    )
+
+@action('get_species_data', method=['GET'])
+@action.uses(db, auth.user)
+def get_species_data():
+    # Example: Return species data for testing or real implementation
+    species = db(db.species).select().as_list()
+    return dict(species=species)
+
 
 @action('checklist', method=['GET'])
 @action.uses('checklist.html', auth.user)
