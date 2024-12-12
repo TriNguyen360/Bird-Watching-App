@@ -11,6 +11,7 @@ app.data = {
             search_query: '',
             selected_species: '',
             show_dropdown: false,
+            region_rectangle: null,
         };
     },
     computed: {
@@ -67,6 +68,23 @@ app.data = {
                 .catch((error) => {
                     console.error("Error loading heatmap data:", error);
                 });
+        },
+        getRegionStats() {
+            if (!this.region_rectangle) return;
+            const bounds = this.region_rectangle.getBounds();
+            const ne = bounds.getNorthEast();
+            const sw = bounds.getSouthWest();
+        
+            window.location.href = "/bird_watching_app/location?ne_lat=" + ne.lat() +
+                "&ne_lng=" + ne.lng() +
+                "&sw_lat=" + sw.lat() +
+                "&sw_lng=" + sw.lng();
+        },
+        deleteRegionRectangle() {
+            if (this.region_rectangle) {
+                this.region_rectangle.setMap(null); // Removes the rectangle from the map
+                this.region_rectangle = null; // Clears the reference so buttons vanish
+            }
         },
     },
     watch: {
@@ -149,25 +167,10 @@ app.init_map = function () {
 
     // Event listener for rectangle complete
     google.maps.event.addListener(drawingManager, "rectanglecomplete", function (rectangle) {
-        const bounds = rectangle.getBounds();
-        const ne = bounds.getNorthEast();
-        const sw = bounds.getSouthWest();
-
-        // Send rectangle bounds to the region_stats endpoint
-        axios.post('/bird_watching_app/region_stats', {
-            ne_lat: ne.lat(),
-            ne_lng: ne.lng(),
-            sw_lat: sw.lat(),
-            sw_lng: sw.lng(),
-        }).then((response) => {
-            console.log("Region Stats:", response.data.stats);
-            // You might show these stats in your UI somehow.
-        }).catch((error) => {
-            console.error("Error fetching region stats:", error);
-        });
-
-        // Remove the rectangle after fetching stats
-        rectangle.setMap(null);
+        if (app.vue.region_rectangle) {
+            app.vue.region_rectangle.setMap(null);
+        }
+        app.vue.region_rectangle = rectangle;
     });
 };
 

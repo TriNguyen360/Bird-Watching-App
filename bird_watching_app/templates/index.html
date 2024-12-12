@@ -91,6 +91,12 @@
   <!-- Map -->
   <div id="map" style="height: 500px; width: 100%;"></div>
 
+  <!-- Region Buttons (appear when a rectangle is drawn) -->
+  <div v-if="region_rectangle" class="buttons" style="margin-top: 1em;">
+    <button class="button is-primary" @click="getRegionStats">Statistics on region</button>
+    <button class="button is-danger" @click="deleteRegionRectangle">Delete region</button>
+  </div>
+  
   <!-- Put here your Vue.js template -->
   <h1 class="title"><i class="fa-solid fa-cube"></i> Title</h1>
   <p>Content: my_value: {{my_value}} </p>
