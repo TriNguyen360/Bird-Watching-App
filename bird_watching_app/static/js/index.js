@@ -85,7 +85,7 @@ app.init_map = function () {
         const sw = bounds.getSouthWest();
 
         // Send rectangle bounds to the region_stats endpoint
-        axios.post('region_stats', {
+        axios.post('/bird_watching_app/region_stats', {
             ne_lat: ne.lat(),
             ne_lng: ne.lng(),
             sw_lat: sw.lat(),
