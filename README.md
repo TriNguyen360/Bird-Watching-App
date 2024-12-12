@@ -1,4 +1,5 @@
 https://stackoverflow.com/questions/13692020/i-am-unable-to-clear-markers-using-setmapnull-or-setvisiblefalse
+https://stackoverflow.com/questions/73192890/removed-polygons-on-google-maps-reappear-after-zoom-out
 
 # Project: Bird Watching App
 

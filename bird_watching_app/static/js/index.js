@@ -3,17 +3,18 @@
 // Vue.js app setup
 let app = {};
 
+let region_rectangle = null;
+
 app.data = {
     data() {
         return {
-            my_value: 1, // Example value
             species_list: [],
             search_query: '',
             selected_species: '',
             show_dropdown: false,
-            region_rectangle: null,
             selected_location: null,
             checklist_marker: null,
+            has_region_rectangle: false,
         };
     },
     computed: {
@@ -23,9 +24,6 @@ app.data = {
         }
     },
     methods: {
-        my_function() {
-            this.my_value += 1;
-        },
         loadSpeciesList() {
             axios.get('/bird_watching_app/get_species_data')
                 .then(response => {
@@ -72,8 +70,8 @@ app.data = {
                 });
         },
         getRegionStats() {
-            if (!this.region_rectangle) return;
-            const bounds = this.region_rectangle.getBounds();
+            if (!region_rectangle) return;
+            const bounds = region_rectangle.getBounds();
             const ne = bounds.getNorthEast();
             const sw = bounds.getSouthWest();
         
@@ -83,9 +81,10 @@ app.data = {
                 "&sw_lng=" + sw.lng();
         },
         deleteRegionRectangle() {
-            if (this.region_rectangle) {
-                this.region_rectangle.setMap(null);
-                this.region_rectangle = null;
+            if (region_rectangle) {
+                region_rectangle.setMap(null);
+                region_rectangle = null;
+                this.has_region_rectangle = false;
             }
         },
         goToChecklist() {
@@ -199,11 +198,15 @@ window.initMap = async function () {
     drawingManager.setMap(app.map);
 
     // Event listener for rectangle complete
-    google.maps.event.addListener(drawingManager, "rectanglecomplete", function (rectangle) {
-        if (app.vue.region_rectangle) {
-            app.vue.region_rectangle.setMap(null);
+    google.maps.event.addListener(drawingManager, "overlaycomplete", function(e) {
+        if (e.type === google.maps.drawing.OverlayType.RECTANGLE) {
+            if (region_rectangle) {
+                console.log("Removing previous rectangle");
+                region_rectangle.setMap(null);
+            }
+            region_rectangle = e.overlay;
+            app.vue.has_region_rectangle = true;
         }
-        app.vue.region_rectangle = rectangle;
     });
 
     // Event listener for map click to select a location for checklist
