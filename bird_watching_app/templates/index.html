@@ -1,41 +1,17 @@
 [[extend 'layout.html']]
-
-<style>
-[v-cloak] {
-     display: none;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
-.dropdown-menu {
-  position: absolute;
-  background: #fff;
-  width: 100%;
-  border: 1px solid #ddd;
-  z-index: 1000;
-}
-.dropdown-content {
-  max-height: 200px;
-  overflow-y: auto;
-}
-.dropdown-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-.dropdown-item:hover {
-  background: #f0f0f0;
-}
-</style>
-
+<link href="/bird_watching_app/static/css/index.css" rel="stylesheet">
 
 <div class="section" id="app" v-cloak>
+  <!-- Title Section -->
+  <div class="hero-section">
+    <h1 class="app-title">Bird Watching App</h1>
+    <p class="app-subtitle">Discover a new world of birding...</p>
+  </div>
+
   <!-- Navigation Menu -->
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-menu">
-      <div class="navbar-start">
+      <div class="navbar-items">
         <a class="navbar-item" href="[[=URL('stats')]]">
           My Stats
         </a>
@@ -87,6 +63,9 @@
 
   <!-- Map -->
   <div id="map" style="height: 500px; width: 100%;"></div>
+
+  <!-- Instructional Text -->
+  <p class="map-instruction">Right-click on the map to delete a marker.</p>
 
   <!-- Buttons to redirect to location, delete rectangle, submit a checklist -->
   <div class="buttons" style="margin-top: 1em; display: flex; justify-content: space-between; align-items: center;">

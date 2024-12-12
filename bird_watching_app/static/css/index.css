@@ -1,0 +1,237 @@
+[v-cloak] {
+    display: none;
+}
+
+.hero-section {
+    background-color: #81c784;
+    padding: 2rem 1rem;
+    text-align: center;
+    border-radius: 10px;
+    margin: 2em auto;
+    max-width: 800px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+    font-size: 3rem;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-subtitle {
+  font-size: 1.5rem;
+  color: #ffffffcc;
+}
+
+body {
+    background-color: #f4f9f4;
+}
+
+.navbar {
+    background-color: #4caf50;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2em; 
+}
+
+.navbar-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-items {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-item {
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none;
+}
+
+.navbar-item:hover {
+    background-color: #81c784;
+    transform: scale(1.05);
+    color: white;
+}
+
+.field .label {
+    color: #4caf50;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.input {
+    border-radius: 50px;
+    padding: 10px 20px;
+    border: 2px solid #4caf50;
+    transition: border-color 0.3s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: #81c784;
+    outline: none;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.dropdown-menu {
+    position: absolute;
+    background: #fff;
+    width: 100%;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-content {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #e8f5e9;
+}
+
+.clear-button {
+    position: absolute;
+    right: 0.5em;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #888;
+    transition: color 0.3s ease;
+}
+
+.clear-button:hover {
+    color: #4caf50;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+    border: 2px solid #4caf50;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.buttons {
+    margin-top: 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttons .button {
+    border-radius: 30px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 0.75rem 1.5rem;
+}
+
+.buttons .button.is-light {
+    background-color: #e0e0e0;
+    color: #888;
+}
+
+.buttons .button.is-light:hover {
+    background-color: #d5d5d5;
+}
+
+.buttons .button.is-info {
+    background-color: #4caf50 !important;
+    color: white !important;
+}
+
+.buttons .button.is-info:hover {
+    background-color: #81c784 !important;
+    transform: scale(1.05);
+}
+
+.buttons .button.is-danger {
+    background-color: #f44336 !important;
+    color: white !important;
+}
+
+.buttons .button.is-danger:hover {
+    background-color: #e57373 !important;
+    transform: scale(1.05);
+}
+
+.buttons .button.is-success {
+    background-color: #388e3c !important;
+    color: white !important;
+}
+
+.buttons .button.is-success:hover {
+    background-color: #66bb6a !important;
+    transform: scale(1.05);
+}
+
+.buttons .button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.map-instruction {
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    margin-top: 0.5em;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .app-title {
+        font-size: 2.5rem;
+    }
+    
+    .app-subtitle {
+        font-size: 1.2rem;
+    }
+    .buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .navbar-menu {
+        justify-content: center;
+    }
+    
+    .navbar-items {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .map-instruction {
+        font-size: 0.85rem;
+        margin-top: 0.4em;
+    }
+}
