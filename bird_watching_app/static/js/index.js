@@ -12,6 +12,8 @@ app.data = {
             selected_species: '',
             show_dropdown: false,
             region_rectangle: null,
+            selected_location: null,
+            checklist_marker: null,
         };
     },
     computed: {
@@ -82,10 +84,30 @@ app.data = {
         },
         deleteRegionRectangle() {
             if (this.region_rectangle) {
-                this.region_rectangle.setMap(null); // Removes the rectangle from the map
-                this.region_rectangle = null; // Clears the reference so buttons vanish
+                this.region_rectangle.setMap(null);
+                this.region_rectangle = null;
             }
         },
+        goToChecklist() {
+            if (this.selected_location) {
+                const lat = this.selected_location.lat;
+                const lng = this.selected_location.lng;
+                window.location.href = "/bird_watching_app/checklist?lat=" + lat + "&lng=" + lng;
+            }
+        },
+        placeChecklistMarker(lat, lng) {
+            // If a marker already exists, just move it.
+            if (this.checklist_marker) {
+                this.checklist_marker.setPosition({lat: lat, lng: lng});
+            } else {
+                // Create a new marker
+                this.checklist_marker = new google.maps.Marker({
+                    position: {lat: lat, lng: lng},
+                    map: app.map,
+                    title: "Selected Location"
+                });
+            }
+        }
     },
     watch: {
         selected_species(newVal) {
@@ -171,6 +193,14 @@ app.init_map = function () {
             app.vue.region_rectangle.setMap(null);
         }
         app.vue.region_rectangle = rectangle;
+    });
+
+    // Event listener for map click to select a location for checklist
+    app.map.addListener('click', function (e) {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        app.vue.selected_location = { lat, lng };
+        app.vue.placeChecklistMarker(lat, lng);
     });
 };
 

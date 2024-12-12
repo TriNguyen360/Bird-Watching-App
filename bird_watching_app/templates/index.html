@@ -96,6 +96,17 @@
     <button class="button is-primary" @click="getRegionStats">Statistics on region</button>
     <button class="button is-danger" @click="deleteRegionRectangle">Delete region</button>
   </div>
+
+  <div class="buttons" style="margin-top: 1em; display: flex; justify-content: flex-end;">
+    <button 
+      class="button" 
+      :class="selected_location ? 'is-success' : 'is-light'" 
+      :disabled="!selected_location"
+      @click="goToChecklist"
+      style="margin-right: 10px;">
+      Submit a Checklist
+    </button>
+  </div>
   
   <!-- Put here your Vue.js template -->
   <h1 class="title"><i class="fa-solid fa-cube"></i> Title</h1>
