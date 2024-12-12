@@ -50,13 +50,28 @@
   </nav>
   
   <!-- Species Selection -->
-  <div class="field">
+  <div class="field" style="position: relative; width: 300px;">
     <label class="label">Select Species</label>
-    <div class="control">
+    <div class="control" style="position: relative;">
       <input class="input" type="text" placeholder="Search species..."
              v-model="search_query" 
              @focus="show_dropdown = true"
-             @blur="hideDropdown">
+             @blur="hideDropdown"
+             style="padding-right: 2em;">
+  
+      <!-- Clear button (X) -->
+      <button v-if="search_query" @click="clearSearch" 
+              style="
+                position: absolute; 
+                right: 0.5em; 
+                top: 50%; 
+                transform: translateY(-50%); 
+                background: none; 
+                border: none; 
+                cursor: pointer;
+                font-size: 1em;">
+        ×
+      </button>
     </div>
     <div class="dropdown" :class="{ 'is-active': show_dropdown && filtered_species.length > 0 }">
       <div class="dropdown-menu" role="menu">

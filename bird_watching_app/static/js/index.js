@@ -33,7 +33,6 @@ app.data = {
                 });
         },
         hideDropdown() {
-            // Use a small delay to allow click events on dropdown items to fire first
             setTimeout(() => {
                 this.show_dropdown = false;
             }, 200);
@@ -42,6 +41,11 @@ app.data = {
             this.selected_species = name;
             this.search_query = name;
             this.show_dropdown = false;
+        },
+        clearSearch() {
+            this.search_query = '';
+            this.selected_species = '';
+            this.loadHeatmapData('');
         },
         loadHeatmapData(species) {
             let url = '/bird_watching_app/heatmap_data';
