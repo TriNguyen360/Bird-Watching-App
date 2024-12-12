@@ -88,23 +88,38 @@
   <!-- Map -->
   <div id="map" style="height: 500px; width: 100%;"></div>
 
-  <!-- Region Buttons (appear when a rectangle is drawn) -->
-  <div v-if="region_rectangle" class="buttons" style="margin-top: 1em;">
-    <button class="button is-primary" @click="getRegionStats">Statistics on region</button>
-    <button class="button is-danger" @click="deleteRegionRectangle">Delete region</button>
+  <!-- Buttons to redirect to location, delete rectangle, submit a checklist -->
+  <div class="buttons" style="margin-top: 1em; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <button 
+        class="button" 
+        :class="region_rectangle ? 'is-info' : 'is-light'"
+        :disabled="!region_rectangle"
+        @click="getRegionStats"
+        style="margin-right: 10px;">
+        Statistics on region
+      </button>
+      <button 
+        class="button" 
+        :class="region_rectangle ? 'is-danger' : 'is-light'"
+        :disabled="!region_rectangle"
+        @click="deleteRegionRectangle"
+        style="margin-right: 10px;">
+        Delete region
+      </button>
+    </div>
+  
+    <div>
+      <button 
+        class="button" 
+        :class="selected_location ? 'is-success' : 'is-light'" 
+        :disabled="!selected_location"
+        @click="goToChecklist">
+        Submit a Checklist
+      </button>
+    </div>
   </div>
 
-  <div class="buttons" style="margin-top: 1em; display: flex; justify-content: flex-end;">
-    <button 
-      class="button" 
-      :class="selected_location ? 'is-success' : 'is-light'" 
-      :disabled="!selected_location"
-      @click="goToChecklist"
-      style="margin-right: 10px;">
-      Submit a Checklist
-    </button>
-  </div>
-  
   <!-- Put here your Vue.js template -->
   <h1 class="title"><i class="fa-solid fa-cube"></i> Title</h1>
   <p>Content: my_value: {{my_value}} </p>
