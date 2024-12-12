@@ -74,6 +74,11 @@ def checklist():
 def location():
     return dict()
 
+@action('my_checklists', method=['GET'])
+@action.uses('checklist.html', auth.user)
+def checklist():
+    return dict()
+
 @action('heatmap_data', method=['GET'])
 @action.uses(db, auth.user)
 def heatmap_data():
