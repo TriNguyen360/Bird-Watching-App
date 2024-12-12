@@ -98,15 +98,23 @@ app.data = {
         placeChecklistMarker(lat, lng) {
             // If a marker already exists, just move it.
             if (this.checklist_marker) {
-                this.checklist_marker.setPosition({lat: lat, lng: lng});
+                this.checklist_marker.position = { lat: lat, lng: lng };
+                this.checklist_marker.map = app.map;
             } else {
-                // Create a new marker
-                this.checklist_marker = new google.maps.Marker({
-                    position: {lat: lat, lng: lng},
+                this.checklist_marker = new google.maps.marker.AdvancedMarkerElement({
+                    position: { lat: lat, lng: lng },
                     map: app.map,
-                    title: "Selected Location"
+                    title: "Selected Location",
+                    ariaLabel: "Selected Location"
                 });
             }
+        },
+        clearChecklistMarker() {
+            if (this.checklist_marker) {
+                this.checklist_marker.map = null;
+                this.checklist_marker = null;
+            }
+            this.selected_location = null;
         }
     },
     watch: {
@@ -123,7 +131,9 @@ app.data = {
 app.vue = Vue.createApp(app.data).mount("#app");
 
 // Map initialization logic
-app.init_map = function () {
+window.initMap = async function () {
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
     // Default location
     const defaultLocation = { lat: 37.7749, lng: -122.4194 };
 
@@ -131,6 +141,7 @@ app.init_map = function () {
     app.map = new google.maps.Map(document.getElementById("map"), {
         center: defaultLocation,
         zoom: 10,
+        mapId: "e31650f773b1207a"
     });
 
     // Geolocation
@@ -202,9 +213,9 @@ app.init_map = function () {
         app.vue.selected_location = { lat, lng };
         app.vue.placeChecklistMarker(lat, lng);
     });
-};
 
-// Global initMap function (called by Google Maps API)
-window.initMap = function () {
-    app.init_map();
+    // Right-click on map: clear marker and reset selected location
+    app.map.addListener('rightclick', function (e) {
+        app.vue.clearChecklistMarker();
+    });
 };
