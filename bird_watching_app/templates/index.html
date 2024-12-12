@@ -4,6 +4,30 @@
 [v-cloak] {
      display: none;
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.dropdown-menu {
+  position: absolute;
+  background: #fff;
+  width: 100%;
+  border: 1px solid #ddd;
+  z-index: 1000;
+}
+.dropdown-content {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background: #f0f0f0;
+}
 </style>
 
 
@@ -25,6 +49,31 @@
     </div>
   </nav>
   
+  <!-- Species Selection -->
+  <div class="field">
+    <label class="label">Select Species</label>
+    <div class="control">
+      <input class="input" type="text" placeholder="Search species..."
+             v-model="search_query" 
+             @focus="show_dropdown = true"
+             @blur="hideDropdown">
+    </div>
+    <div class="dropdown" :class="{ 'is-active': show_dropdown && filtered_species.length > 0 }">
+      <div class="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <a href="#" 
+             class="dropdown-item" 
+             v-for="sp in filtered_species" 
+             :key="sp.id"
+             @mousedown.prevent="selectSpecies(sp.common_name)">
+            {{ sp.common_name }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map -->
   <div id="map" style="height: 500px; width: 100%;"></div>
 
   <!-- Put here your Vue.js template -->

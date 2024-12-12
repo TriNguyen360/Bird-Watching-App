@@ -2,17 +2,78 @@
 
 // Vue.js app setup
 let app = {};
+
 app.data = {
-    data: function () {
+    data() {
         return {
             my_value: 1, // Example value
+            species_list: [],
+            search_query: '',
+            selected_species: '',
+            show_dropdown: false,
         };
     },
+    computed: {
+        filtered_species() {
+            const q = this.search_query.toLowerCase();
+            return this.species_list.filter(sp => sp.common_name.toLowerCase().includes(q));
+        }
+    },
     methods: {
-        my_function: function () {
+        my_function() {
             this.my_value += 1;
         },
+        loadSpeciesList() {
+            axios.get('/bird_watching_app/get_species_data')
+                .then(response => {
+                    this.species_list = response.data.species;
+                })
+                .catch(error => {
+                    console.error("Error loading species data:", error);
+                });
+        },
+        hideDropdown() {
+            // Use a small delay to allow click events on dropdown items to fire first
+            setTimeout(() => {
+                this.show_dropdown = false;
+            }, 200);
+        },
+        selectSpecies(name) {
+            this.selected_species = name;
+            this.search_query = name;
+            this.show_dropdown = false;
+        },
+        loadHeatmapData(species) {
+            let url = '/bird_watching_app/heatmap_data';
+            if (species && species.trim()) {
+                url += '?species=' + encodeURIComponent(species);
+            }
+            axios.get(url)
+                .then(response => {
+                    const points = response.data.points.map((p) => {
+                        return {
+                            location: new google.maps.LatLng(p[0], p[1]),
+                            weight: p[2]
+                        };
+                    });
+                    if (app.heatmap) {
+                        app.heatmap.setData(points);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading heatmap data:", error);
+                });
+        },
     },
+    watch: {
+        selected_species(newVal) {
+            // Whenever the selected species changes, reload the heatmap
+            this.loadHeatmapData(newVal);
+        }
+    },
+    mounted() {
+        this.loadSpeciesList();
+    }
 };
 
 app.vue = Vue.createApp(app.data).mount("#app");
@@ -52,7 +113,10 @@ app.init_map = function () {
         map: app.map
     });
 
-    // Fetch heatmap data from your backend
+    // Store the heatmap for later updates
+    app.heatmap = heatmap;
+
+    // Initial load of all species data
     axios.get('/bird_watching_app/heatmap_data').then(response => {
         // response.data.points should be [[lat, lng, weight], ...]
         const points = response.data.points.map((p) => {
@@ -64,6 +128,7 @@ app.init_map = function () {
 
         // Update the heatmap data
         heatmap.setData(points);
+        heatmap.set('radius', 50);
     }).catch((error) => {
         console.error("Error loading heatmap data:", error);
     });

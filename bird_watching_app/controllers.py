@@ -77,16 +77,18 @@ def location():
 @action('heatmap_data', method=['GET'])
 @action.uses(db, auth.user)
 def heatmap_data():
-    points = []
-    rows = db(db.sightings).select(
+    species_param = request.params.get('species')
+    q = (db.sightings.sampling_event_identifier == db.checklists.sampling_event_identifier)
+    if species_param and species_param.strip():
+        q &= (db.sightings.common_name == species_param)
+
+    rows = db(q).select(
         db.sightings.observation_count,
         db.checklists.latitude,
-        db.checklists.longitude,
-        join=db.sightings.on(
-            db.sightings.sampling_event_identifier == db.checklists.sampling_event_identifier
-        ),
+        db.checklists.longitude
     )
 
+    points = []
     for row in rows:
         points.append([row.checklists.latitude, row.checklists.longitude, row.sightings.observation_count])
 
