@@ -1,111 +1,83 @@
 [[extend 'layout.html']]
 
-<style>
-[v-cloak] {
-    display: none;
-}
+<!-- CSS Links -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="/bird_watching_app/static/css/checklist.css" rel="stylesheet">
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+<div class="container mt-5" id="checklist-app" v-cloak>
+  <!-- Header Section -->
+  <div class="header-section text-center mb-4">
+    <h1 class="app-title">Submit a Checklist</h1>
+    <p class="app-subtitle">Record your bird-watching observations.</p>
+    <a href="[[=URL('index')]]" class="btn header-btn">Back to Homepage</a>
+  </div>
 
-.title {
-    text-align: center;
-    margin-bottom: 20px;
-}
+  <!-- Checklist Form -->
+  <div v-if="location">
+    <div class="location-info text-center mb-3">
+      <p><strong>Selected Location:</strong> {{ location.lat }}, {{ location.lng }}</p>
+    </div>
 
-.search-bar {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
+    <!-- Search Species -->
+    <div class="search-section mb-4">
+      <input 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Search species..." 
+        v-model="searchQuery"
+      />
+    </div>
 
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #f4f4f4;
-}
-
-button {
-    cursor: pointer;
-}
-</style>
-
-<div id="checklist-app" v-cloak class="container">
-    <h1 class="title">Submit a Checklist</h1>
-
-    <!-- Search Bar Placeholder -->
-    <input type="text" class="search-bar" placeholder="Search for a species..." v-model="searchQuery">
-
-    <!-- Table Placeholder -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Species</th>
-                <th>Count</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Placeholder for Species Rows -->
-            <tr v-for="species in filteredSpecies" :key="species.id">
-                <td>{{ species.name }}</td>
-                <td>
-                    <input type="number" min="0" v-model.number="species.count" style="width: 60px;">
-                </td>
-                <td>
-                    <button>+</button>
-                    <button>-</button>
-                </td>
-            </tr>
-        </tbody>
+    <!-- Species List -->
+    <table class="species-table table table-bordered">
+      <thead>
+        <tr>
+          <th>Species</th>
+          <th>Count</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="species in filteredSpecies" :key="species.id">
+          <td>{{ species.common_name }}</td>
+          <td>
+            <input 
+              type="number" 
+              class="count-input form-control" 
+              v-model.number="species.count" 
+              min="0"
+            />
+          </td>
+          <td>
+            <button class="btn btn-success btn-sm" @click="incrementCount(species)">+</button>
+            <button 
+              class="btn btn-danger btn-sm" 
+              @click="decrementCount(species)" 
+              :disabled="species.count <= 0">-</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
 
     <!-- Submit Button -->
-    <button class="button is-primary" @click="submitChecklist">Submit Checklist</button>
+    <div class="text-center">
+      <button 
+        class="btn submit-btn" 
+        @click="submitChecklist" 
+        :disabled="!hasSightings">Submit Checklist</button>
+    </div>
+  </div>
+
+  <!-- Error Message for Missing Location -->
+  <div v-else>
+    <div class="alert alert-danger text-center">
+      <strong>Error:</strong> No location selected. Please go back to the map and select a location.
+    </div>
+  </div>
 </div>
 
+<!-- JavaScript Links -->
 [[block page_scripts]]
-<script>
-const checklistApp = {
-    data() {
-        return {
-            searchQuery: '', // Placeholder for search query
-            species: [], // Placeholder for species data
-        };
-    },
-    computed: {
-        filteredSpecies() {
-            // Placeholder computed property for filtered species
-            return this.species; // No filtering logic yet
-        }
-    },
-    methods: {
-        submitChecklist() {
-            // Placeholder for checklist submission logic
-            alert('Submit checklist logic not implemented yet.');
-        }
-    },
-    mounted() {
-        // Placeholder for species loading logic
-        console.log('Checklist page mounted.');
-    }
-};
-
-Vue.createApp(checklistApp).mount('#checklist-app');
-</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+<script src="/bird_watching_app/static/js/checklist.js"></script>
 [[end]]
