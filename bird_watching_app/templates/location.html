@@ -1,5 +1,117 @@
 [[extend 'layout.html']]
 
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<div class="container mt-5" id="location-app" v-cloak>
+  <div class="row mb-5">
+    <div class="col text-center">
+      <h1 class="display-4 text-success">Region Information</h1>
+      <p class="lead text-muted">Check out all the bird data for this region!</p>
+    </div>
+  </div>
+
+  <!-- Species and Sightings Together -->
+  <div class="row">
+    <!-- Species in Region -->
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="bi bi-list-task"></i> Species in the Region</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li v-for="species in regionStats" :key="species.species"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+              @click="selectSpecies(species.species)" :class="{ active: selectedSpecies === species.species }">
+              <span>{{ species.species }}</span>
+              <span class="badge bg-success">{{ species.sightings }} sightings</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sightings Graph -->
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="bi bi-graph-up"></i> Sightings Over Time</h5>
+        </div>
+        <div class="card-body" v-if="selectedSpecies">
+          <canvas id="speciesChart"></canvas>
+        </div>
+        <div class="card-body" v-else>
+          <p class="text-muted">Select a species to review their data more in-depth.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Contributors -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="bi bi-people"></i> Top Contributors</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li v-for="contributor in topContributors" :key="contributor.name"
+              class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ contributor.name }}</span>
+              <span class="badge bg-success">{{ contributor.contributions }} contributions</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+[[block page_scripts]]
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="../static/js/location.js"></script>
+[[end]]
+
+
+
+
+
+
+<!-- 
+
+OLD NOTES:
+
+When a user selects a region on the map and clicks on
+  "region information"
+
+  send coordinates to Location page.
+
+We receive it and scan the database for all data in region.
+
+Then we display a list of the species seen in this region.
+  - # of checklists
+  - # of sightings
+
+We will also display a type of graph that shows the # of birds
+in a species seen over time.
+
+So when a user clicks on one of the spceis in the list:
+  it should create a graph with that info.
+
+Also some extra stuff including
+  - Top contributors of the region
+
+
+Use D3.js & Chart.js
+
+
+
 <div class="section">
   <h1>Hello, World!</h1>
-</div>
+</div> -->
