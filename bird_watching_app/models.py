@@ -47,12 +47,15 @@ species_file = os.path.join(data_folder, 'species.csv')
 checklists_file = os.path.join(data_folder, 'checklists.csv')
 sightings_file = os.path.join(data_folder, 'sightings.csv')
 
+#Can comment the .delete()s out after running once since takes a while to load data
+db(db.species).delete()
 if db(db.species).isempty():
     with open(species_file, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
             db.species.insert(common_name=row['COMMON NAME'])
 
+db(db.checklists).delete()
 if db(db.checklists).isempty():
     with open(checklists_file, 'r') as f:
         reader = csv.DictReader(f)
@@ -71,6 +74,7 @@ if db(db.checklists).isempty():
                 duration_minutes=float(row['DURATION MINUTES']) if row['DURATION MINUTES'] else None,
             )
 
+db(db.sightings).delete()
 if db(db.sightings).isempty():
     with open(sightings_file, 'r') as f:
         reader = csv.DictReader(f)
@@ -81,7 +85,7 @@ if db(db.sightings).isempty():
             observation_count = 0 if row['OBSERVATION COUNT'] == 'X' else int(row['OBSERVATION COUNT'])
             db.sightings.insert(
                 sampling_event_identifier=row['SAMPLING EVENT IDENTIFIER'],
-                species_id=species.id,
+                common_name=row['COMMON NAME'],
                 observation_count=observation_count,
             )
 
