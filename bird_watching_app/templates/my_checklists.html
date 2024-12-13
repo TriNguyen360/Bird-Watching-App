@@ -1,11 +1,49 @@
 [[extend 'layout.html']]
 
-<div class="container mt-5">
+<link href="/bird_watching_app/static/css/my_checklists.css" rel="stylesheet">
+
+<div class="container mt-5" id="my-checklists-app" v-cloak>
+  <!-- Header Section -->
   <div class="row mb-5">
     <div class="col text-center">
       <h1 class="display-4 text-primary">My Checklists</h1>
-      <p class="lead text-muted">View your bird-watching checklists.</p>
+      <p class="lead text-muted">View and manage your bird-watching checklists.</p>
+    </div>
+  </div>
+
+  <!-- Checklists Table -->
+  <div v-if="checklists.length > 0">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Location</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="checklist in checklists" :key="checklist.id">
+          <td>{{ checklist.date }}</td>
+          <td>{{ checklist.latitude }}, {{ checklist.longitude }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" @click="deleteChecklist(checklist.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div v-else>
+    <div class="alert alert-info text-center">
+      <a href="[[=URL('index')]]" class="btn btn-success">
+        Back to Homepage
+      </a>
     </div>
   </div>
 </div>
-[[end]]
+
+<script>
+  // Pass the `checklists` data from the server to the Vue app
+  const checklistsData = [[=XML(checklists)]];
+</script>
+
+<script src="/bird_watching_app/static/js/my_checklists.js"></script>
