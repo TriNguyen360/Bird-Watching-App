@@ -17,6 +17,7 @@
       <thead>
         <tr>
           <th>Date</th>
+          <th>Time</th> <!-- Added Time Column -->
           <th>Location</th>
           <th>Actions</th>
         </tr>
@@ -24,13 +25,16 @@
       <tbody>
         <tr v-for="checklist in checklists" :key="checklist.id">
           <td>{{ checklist.date }}</td>
+          <td>{{ checklist.time }}</td> <!-- Display Time -->
           <td>{{ checklist.latitude }}, {{ checklist.longitude }}</td>
           <td>
             <button class="btn btn-danger btn-sm" @click="deleteChecklist(checklist.id)">Delete</button>
+            <button class="btn btn-info btn-sm" @click="editChecklist(checklist.id)">Edit</button>
           </td>
         </tr>
       </tbody>
     </table>
+    
   </div>
 
   <!-- No Checklists Message -->

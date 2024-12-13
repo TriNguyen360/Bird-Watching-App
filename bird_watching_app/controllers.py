@@ -138,12 +138,12 @@ def submit_checklist():
         latitude = first_entry['location']['lat']
         longitude = first_entry['location']['lng']
 
-        # Insert the checklist
         db.checklists.insert(
             sampling_event_identifier=sampling_event_identifier,
             latitude=latitude,
             longitude=longitude,
             observation_date=datetime.date.today(),
+            time_observations_started=datetime.datetime.now().time(),  # Add current time
             observer_id=user_id
         )
 
@@ -171,20 +171,24 @@ def my_checklists():
     user_id = auth.current_user.get('id')  # Ensure correct user ID
     logger.info(f"Fetching checklists for user_id: {user_id}")  # Log user_id for debugging
     
-    # Fetch only necessary fields: date, latitude, longitude
     checklists = db(db.checklists.observer_id == user_id).select(
         db.checklists.id,
         db.checklists.latitude,
         db.checklists.longitude,
         db.checklists.observation_date,
+        db.checklists.time_observations_started,
     ).as_list()
     
-    # Convert observation_date to string
+    # Convert observation_date and time_observations_started to strings
     for checklist in checklists:
         checklist['date'] = checklist.pop('observation_date').isoformat()
+        checklist['time'] = str(checklist.pop('time_observations_started'))  # Convert time to string
     
     logger.info(f"Checklists fetched: {checklists}")  # Log fetched data for debugging
+    
     return dict(checklists=checklists)
+
+
 
 
 @action('get_region_data', method=['GET'])
