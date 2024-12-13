@@ -313,6 +313,140 @@ def api_update_checklist(id=None):
         db.rollback()
         logger.error(f"Error in update_checklist: {e}")
         return dict(status="error", message="An error occurred while updating the checklist.")
+    
+@action('api/stats/species_observed', method=['GET'])
+@action.uses(db, auth.user)
+def api_species_observed():
+    user_id = auth.current_user.get('id')
+    
+    # Join checklists and sightings using sampling_event_identifier
+    # Then join sightings and species using common_name
+    query = (
+        (db.checklists.observer_id == user_id) &
+        (db.checklists.sampling_event_identifier == db.sightings.sampling_event_identifier) &
+        (db.sightings.common_name == db.species.common_name)
+    )
+    
+    species_counts = db(query).select(
+        db.species.id,
+        db.species.common_name,
+        db.sightings.observation_count
+    )
+    
+    # Aggregate sightings per species
+    species_dict = {}
+    for row in species_counts:
+        species_id = row.species.id
+        common_name = row.species.common_name
+        count = row.sightings.observation_count
+        if species_id in species_dict:
+            species_dict[species_id]['sightings'] += count
+        else:
+            species_dict[species_id] = {
+                'id': species_id,
+                'common_name': common_name,
+                'sightings': count
+            }
+    
+    species_list = list(species_dict.values())
+    
+    return dict(status="success", species=species_list)
+
+
+@action('api/stats/trends', method=['GET'])
+@action.uses(db, auth.user)
+def api_trends():
+    user_id = auth.current_user.get('id')
+    
+    # Join checklists and sightings using sampling_event_identifier
+    query = (
+        (db.checklists.observer_id == user_id) &
+        (db.checklists.sampling_event_identifier == db.sightings.sampling_event_identifier)
+    )
+    
+    trends = db(query).select(
+        db.checklists.observation_date,
+        db.sightings.observation_count
+    )
+    
+    # Aggregate counts per date
+    trend_dict = {}
+    for row in trends:
+        date = row.checklists.observation_date.isoformat()
+        count = row.sightings.observation_count
+        if date in trend_dict:
+            trend_dict[date] += count
+        else:
+            trend_dict[date] = count
+    
+    # Sort the dates
+    sorted_trends = sorted(trend_dict.items())
+    
+    trends_list = [{'date': date, 'count': count} for date, count in sorted_trends]
+    
+    return dict(status="success", trends=trends_list)
+
+
+@action('api/stats/species_details/<species_id>', method=['GET'])
+@action.uses(db, auth.user)
+def api_species_details(species_id=None):
+    if not species_id:
+        return dict(status="error", message="No species ID provided.")
+    
+    user_id = auth.current_user.get('id')
+    
+    # Retrieve the common_name for the given species_id
+    species_record = db(db.species.id == species_id).select().first()
+    if not species_record:
+        return dict(status="error", message="Species not found.")
+    
+    common_name = species_record.common_name
+    
+    # Verify that the species is observed by the user
+    query = (
+        (db.checklists.observer_id == user_id) &
+        (db.checklists.sampling_event_identifier == db.sightings.sampling_event_identifier) &
+        (db.sightings.common_name == common_name)
+    )
+    
+    sightings = db(query).select(
+        db.checklists.observation_date,
+        db.checklists.latitude,
+        db.checklists.longitude,
+        db.sightings.observation_count
+    )
+    
+    if not sightings:
+        return dict(status="error", message="No sightings found for this species.")
+    
+    # Prepare observation counts over time
+    dates_counts = {}
+    locations = []
+    for row in sightings:
+        date = row.checklists.observation_date.isoformat()
+        count = row.sightings.observation_count
+        if date in dates_counts:
+            dates_counts[date] += count
+        else:
+            dates_counts[date] = count
+        
+        # Collect unique locations
+        loc = {'lat': row.checklists.latitude, 'lng': row.checklists.longitude}
+        if loc not in locations:
+            locations.append(loc)
+    
+    # Sort dates
+    sorted_dates = sorted(dates_counts.items())
+    dates = [item[0] for item in sorted_dates]
+    counts = [item[1] for item in sorted_dates]
+    
+    species_details = {
+        'dates': dates,
+        'counts': counts,
+        'locations': locations
+    }
+    
+    return dict(status="success", species_details=species_details)
 
 @action('get_region_data', method=['GET'])
 @action.uses(db, auth.user)
