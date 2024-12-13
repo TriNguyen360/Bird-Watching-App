@@ -124,16 +124,20 @@ def submit_checklist():
     for entry in data:
         db.sightings.insert(
             species_id=entry['species_id'],
-            count=entry['count'],
+            observation_count=entry['count'],
             latitude=entry['location']['lat'],
             longitude=entry['location']['lng'],
-            user_id=auth.current_user.get('id')
         )
     return dict(status="success")
+
 
 
 @action('my_checklists', method=['GET'])
 @action.uses('my_checklists.html', db, auth.user)
 def my_checklists():
-    return dict(checklists=[])
-
+    # Return sample data for simplicity
+    checklists = [
+        {"id": 1, "date": "2023-12-01", "latitude": 37.7749, "longitude": -122.4194},
+        {"id": 2, "date": "2023-12-02", "latitude": 40.7128, "longitude": -74.0060},
+    ]
+    return dict(checklists=checklists)
