@@ -37,7 +37,9 @@ db.define_table(
     Field('time_observations_started', 'time'),
     Field('observer_id', 'string'),
     Field('duration_minutes', 'double'),
+    Field('user_id', 'reference auth_user', required=True), 
 )
+
 
 data_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
