@@ -30,6 +30,7 @@ from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
 from .models import get_user_email
+import datetime
 
 url_signer = URLSigner(session)
 
@@ -121,21 +122,69 @@ def region_stats():
 @action.uses(db, auth.user)
 def submit_checklist():
     data = request.json.get('checklist', [])
-    for entry in data:
-        db.sightings.insert(
-            species_id=entry['species_id'],
-            count=entry['count'],
-            latitude=entry['location']['lat'],
-            longitude=entry['location']['lng'],
-            user_id=auth.current_user.get('id')
+    if not data:
+        return dict(status="error", message="No checklist data provided.")
+
+    try:
+        # Generate a unique identifier for the checklist
+        import uuid
+        sampling_event_identifier = str(uuid.uuid4())
+
+        # Get the user ID
+        user_id = auth.current_user.get('id')
+
+        # Extract location data from the first entry
+        first_entry = data[0]
+        latitude = first_entry['location']['lat']
+        longitude = first_entry['location']['lng']
+
+        # Insert the checklist
+        db.checklists.insert(
+            sampling_event_identifier=sampling_event_identifier,
+            latitude=latitude,
+            longitude=longitude,
+            observation_date=datetime.date.today(),
+            observer_id=user_id
         )
-    return dict(status="success")
+
+        # Insert sightings
+        for entry in data:
+            species = db(db.species.id == entry['species_id']).select().first()
+            if species:
+                db.sightings.insert(
+                    sampling_event_identifier=sampling_event_identifier,
+                    common_name=species.common_name,
+                    observation_count=entry['count']
+                )
+
+        return dict(status="success", message="Checklist added successfully!")
+
+    except Exception as e:
+        logger.error(f"Error in submit_checklist: {e}")
+        return dict(status="error", message="An error occurred while submitting the checklist.")
+
 
 
 @action('my_checklists', method=['GET'])
 @action.uses('my_checklists.html', db, auth.user)
 def my_checklists():
-    return dict(checklists=[])
+    user_id = auth.current_user.get('id')  # Ensure correct user ID
+    logger.info(f"Fetching checklists for user_id: {user_id}")  # Log user_id for debugging
+    
+    # Fetch only necessary fields: date, latitude, longitude
+    checklists = db(db.checklists.observer_id == user_id).select(
+        db.checklists.id,
+        db.checklists.latitude,
+        db.checklists.longitude,
+        db.checklists.observation_date,
+    ).as_list()
+    
+    # Convert observation_date to string
+    for checklist in checklists:
+        checklist['date'] = checklist.pop('observation_date').isoformat()
+    
+    logger.info(f"Checklists fetched: {checklists}")  # Log fetched data for debugging
+    return dict(checklists=checklists)
 
 
 @action('get_region_data', method=['GET'])
@@ -254,3 +303,13 @@ def get_species_time_data():
     ]
 
     return dict(time_series=time_series)
+
+
+
+# Debug checklist function:
+@action('debug-my-checklists', method=['GET'])
+@action.uses(db, auth.user)
+def debug_my_checklists():
+    user_id = auth.current_user.get('id')
+    checklists = db(db.checklists.observer_id == user_id).select().as_list()
+    return dict(checklists=checklists)

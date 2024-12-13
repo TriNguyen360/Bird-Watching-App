@@ -13,6 +13,7 @@ const myChecklistsApp = {
         const response = await fetch('/bird_watching_app/my_checklists');
         if (response.ok) {
           const data = await response.json();
+          console.log('Fetched checklists:', data.checklists); // Debugging: Log fetched data
           this.checklists = data.checklists; // Populate the checklists array
         } else {
           console.error('Failed to fetch checklists.');
@@ -41,7 +42,7 @@ const myChecklistsApp = {
     },
   },
   async mounted() {
-    // Fetch checklists on component mount
+    console.log('Component mounted: Fetching checklists...'); // Debugging: Log lifecycle event
     await this.fetchChecklists();
   },
 };

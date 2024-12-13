@@ -1,6 +1,5 @@
 [[extend 'layout.html']]
 
-<!-- CSS Links -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="/bird_watching_app/static/css/my_checklists.css" rel="stylesheet">
 
@@ -28,7 +27,6 @@
           <td>{{ checklist.latitude }}, {{ checklist.longitude }}</td>
           <td>
             <button class="btn btn-danger btn-sm" @click="deleteChecklist(checklist.id)">Delete</button>
-            <button class="btn btn-info btn-sm" @click="editChecklist(checklist.id)">Edit</button>
           </td>
         </tr>
       </tbody>
@@ -43,8 +41,5 @@
   </div>
 </div>
 
-<!-- JavaScript Links -->
-[[block page_scripts]]
 <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
 <script src="/bird_watching_app/static/js/my_checklists.js"></script>
-[[end]]
