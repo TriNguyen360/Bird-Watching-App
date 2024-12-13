@@ -1,5 +1,111 @@
 [[extend 'layout.html']]
 
-<div class="section">
-  <h1>Hello, World!</h1>
+<style>
+[v-cloak] {
+    display: none;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+button {
+    cursor: pointer;
+}
+</style>
+
+<div id="checklist-app" v-cloak class="container">
+    <h1 class="title">Submit a Checklist</h1>
+
+    <!-- Search Bar Placeholder -->
+    <input type="text" class="search-bar" placeholder="Search for a species..." v-model="searchQuery">
+
+    <!-- Table Placeholder -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Species</th>
+                <th>Count</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Placeholder for Species Rows -->
+            <tr v-for="species in filteredSpecies" :key="species.id">
+                <td>{{ species.name }}</td>
+                <td>
+                    <input type="number" min="0" v-model.number="species.count" style="width: 60px;">
+                </td>
+                <td>
+                    <button>+</button>
+                    <button>-</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Submit Button -->
+    <button class="button is-primary" @click="submitChecklist">Submit Checklist</button>
 </div>
+
+[[block page_scripts]]
+<script>
+const checklistApp = {
+    data() {
+        return {
+            searchQuery: '', // Placeholder for search query
+            species: [], // Placeholder for species data
+        };
+    },
+    computed: {
+        filteredSpecies() {
+            // Placeholder computed property for filtered species
+            return this.species; // No filtering logic yet
+        }
+    },
+    methods: {
+        submitChecklist() {
+            // Placeholder for checklist submission logic
+            alert('Submit checklist logic not implemented yet.');
+        }
+    },
+    mounted() {
+        // Placeholder for species loading logic
+        console.log('Checklist page mounted.');
+    }
+};
+
+Vue.createApp(checklistApp).mount('#checklist-app');
+</script>
+[[end]]
