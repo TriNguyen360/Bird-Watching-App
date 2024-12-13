@@ -32,25 +32,25 @@ body {
     background-color: #f4f9f4;
 }
 
-.navbar {
+.page-navbar {
     background-color: #4caf50;
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 2em; 
 }
 
-.navbar-menu {
+.page-navbar navbar-menu {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.navbar-items {
+.page-navbar navbar-items {
     display: flex;
     gap: 20px;
 }
 
-.navbar-item {
+.page-navbar navbar-item {
     color: white;
     font-weight: bold;
     padding: 0.5rem 1rem;
@@ -59,7 +59,7 @@ body {
     text-decoration: none;
 }
 
-.navbar-item:hover {
+.page-navebar navbar-item:hover {
     background-color: #81c784;
     transform: scale(1.05);
     color: white;
