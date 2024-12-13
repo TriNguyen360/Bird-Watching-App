@@ -168,9 +168,12 @@ def submit_checklist():
 @action('my_checklists', method=['GET'])
 @action.uses('my_checklists.html', db, auth.user)
 def my_checklists():
-    user_id = auth.current_user.get('id')  # Ensure correct user ID
-    logger.info(f"Fetching checklists for user_id: {user_id}")  # Log user_id for debugging
-    
+    return dict()
+
+@action('api/my_checklists', method=['GET'])
+@action.uses(db, auth.user)
+def api_my_checklists():
+    user_id = auth.current_user.get('id')
     checklists = db(db.checklists.observer_id == user_id).select(
         db.checklists.id,
         db.checklists.latitude,
@@ -182,14 +185,134 @@ def my_checklists():
     # Convert observation_date and time_observations_started to strings
     for checklist in checklists:
         checklist['date'] = checklist.pop('observation_date').isoformat()
-        checklist['time'] = str(checklist.pop('time_observations_started'))  # Convert time to string
-    
-    logger.info(f"Checklists fetched: {checklists}")  # Log fetched data for debugging
+        checklist['time'] = str(checklist.pop('time_observations_started'))
     
     return dict(checklists=checklists)
 
+@action('delete_checklist/<id>', method=['DELETE'])
+@action.uses(db, auth.user)
+def delete_checklist(id):
+    user_id = auth.current_user.get('id')
+    
+    # Verify that the checklist belongs to the current user
+    checklist = db((db.checklists.id == id) & (db.checklists.observer_id == user_id)).select().first()
+    if not checklist:
+        return dict(status="error", message="Checklist not found or unauthorized.")
+    
+    try:
+        # Delete associated sightings first to maintain referential integrity
+        db(db.sightings.sampling_event_identifier == checklist.sampling_event_identifier).delete()
+        
+        # Delete the checklist
+        db(db.checklists.id == id).delete()
+        
+        db.commit()
+        return dict(status="success", message="Checklist deleted successfully.")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Error deleting checklist {id}: {e}")
+        return dict(status="error", message="An error occurred while deleting the checklist.")
+    
+@action('edit_checklist/<id>', method=['GET'])
+@action.uses('edit_checklists.html', db, auth.user)
+def edit_checklist_page(id=None):
+    if not id:
+        abort(404, "Checklist ID not provided.")
+    # Optionally, you can pass the checklist ID to the template if needed
+    return dict()
 
+@action('api/get_checklist/<id>', method=['GET'])
+@action.uses(db, auth.user)
+def api_get_checklist(id=None):
+    if not id:
+        return dict(status="error", message="No checklist ID provided.")
+    
+    # Fetch the checklist ensuring it belongs to the current user
+    user_id = auth.current_user.get('id')
+    checklist = db((db.checklists.id == id) & (db.checklists.observer_id == user_id)).select().first()
+    
+    if not checklist:
+        return dict(status="error", message="Checklist not found or unauthorized.")
+    
+    # Fetch associated sightings
+    sightings = db(db.sightings.sampling_event_identifier == checklist.sampling_event_identifier).select().as_list()
+    
+    # Prepare data for frontend
+    checklist_data = {
+        'id': checklist.id,
+        'sampling_event_identifier': checklist.sampling_event_identifier,
+        'latitude': checklist.latitude,
+        'longitude': checklist.longitude,
+        'observation_date': checklist.observation_date.isoformat(),
+        'time_observations_started': str(checklist.time_observations_started),
+        'observer_id': checklist.observer_id,
+        'duration_minutes': checklist.duration_minutes,
+        'sightings': sightings  # List of sightings
+    }
+    
+    return dict(status="success", checklist=checklist_data)
 
+@action('api/update_checklist/<id>', method=['POST'])
+@action.uses(db, auth.user)
+def api_update_checklist(id=None):
+    if not id:
+        return dict(status="error", message="No checklist ID provided.")
+    
+    user_id = auth.current_user.get('id')
+    checklist = db((db.checklists.id == id) & (db.checklists.observer_id == user_id)).select().first()
+    
+    if not checklist:
+        return dict(status="error", message="Checklist not found or unauthorized.")
+    
+    data = request.json
+    if not data:
+        return dict(status="error", message="No data received.")
+    
+    try:
+        # Update checklist fields
+        checklist.latitude = data.get('latitude', checklist.latitude)
+        checklist.longitude = data.get('longitude', checklist.longitude)
+        checklist.observation_date = datetime.datetime.strptime(data.get('observation_date'), '%Y-%m-%d').date() if data.get('observation_date') else checklist.observation_date
+        checklist.time_observations_started = datetime.datetime.strptime(data.get('time_observations_started'), '%H:%M:%S').time() if data.get('time_observations_started') else checklist.time_observations_started
+        checklist.duration_minutes = float(data.get('duration_minutes', checklist.duration_minutes))
+        
+        # Update checklist in the database
+        db(db.checklists.id == id).update(
+            latitude=checklist.latitude,
+            longitude=checklist.longitude,
+            observation_date=checklist.observation_date,
+            time_observations_started=checklist.time_observations_started,
+            duration_minutes=checklist.duration_minutes
+        )
+        
+        # Update sightings
+        # For simplicity, delete existing sightings and re-insert
+        db(db.sightings.sampling_event_identifier == checklist.sampling_event_identifier).delete()
+        
+        sightings = data.get('sightings', [])
+        for sight in sightings:
+            species_id = sight.get('species_id')
+            count = sight.get('observation_count', 0)
+            if not species_id or count <= 0:
+                continue  # Skip invalid entries
+            
+            species = db(db.species.id == species_id).select().first()
+            if not species:
+                continue  # Skip if species doesn't exist
+            
+            db.sightings.insert(
+                sampling_event_identifier=checklist.sampling_event_identifier,
+                species_id=species.id,
+                observation_count=count
+            )
+        
+        db.commit()
+        return dict(status="success", message="Checklist updated successfully!")
+    
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Error in update_checklist: {e}")
+        return dict(status="error", message="An error occurred while updating the checklist.")
 
 @action('get_region_data', method=['GET'])
 @action.uses(db, auth.user)
@@ -317,3 +440,16 @@ def debug_my_checklists():
     user_id = auth.current_user.get('id')
     checklists = db(db.checklists.observer_id == user_id).select().as_list()
     return dict(checklists=checklists)
+
+
+@action('debug-database', method=['GET'])
+@action.uses(auth.user, db)
+def debug_database():
+    sightings = db(db.sightings).select().as_list()
+    species = db(db.species).select().as_list()
+    checklists = db(db.checklists).select().as_list()
+    return dict(
+        sightings=sightings,
+        species=species,
+        checklists=checklists,
+    )

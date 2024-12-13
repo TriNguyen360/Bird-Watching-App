@@ -9,8 +9,7 @@ const myChecklistsApp = {
   methods: {
     async fetchChecklists() {
       try {
-        // Fetch checklists from the backend
-        const response = await fetch('/bird_watching_app/my_checklists');
+        const response = await fetch('/bird_watching_app/api/my_checklists');
         if (response.ok) {
           const data = await response.json();
           console.log('Fetched checklists:', data.checklists); // Debugging: Log fetched data
@@ -29,16 +28,22 @@ const myChecklistsApp = {
       try {
         const response = await fetch(`/bird_watching_app/delete_checklist/${id}`, {
           method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
         });
-        if (response.ok) {
-          alert('Checklist deleted successfully!');
+        const result = await response.json();
+        if (response.ok && result.status === 'success') {
+          alert(result.message);
           this.checklists = this.checklists.filter(checklist => checklist.id !== id);
         } else {
-          alert('Failed to delete checklist. Please try again.');
+          alert(`Failed to delete checklist: ${result.message}`);
         }
       } catch (error) {
         console.error('Error deleting checklist:', error);
+        alert('An error occurred while deleting the checklist. Please try again.');
       }
+    },
+    goToEditChecklist(id) {
+      window.location.href = `/bird_watching_app/edit_checklist/${id}`;
     },
   },
   async mounted() {

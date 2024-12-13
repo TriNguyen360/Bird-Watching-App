@@ -1,0 +1,67 @@
+/* General body styling */
+body {
+    background-color: #f4f9f4;
+  }
+  
+  /* Header section styling */
+  .header-section {
+    margin-bottom: 20px;
+  }
+  .app-title {
+    font-size: 2rem;
+    color: #4caf50;
+  }
+  .app-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  .header-btn {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+  }
+  .header-btn:hover {
+    background-color: #81c784;
+  }
+  
+  /* Search and Submit Section */
+  .search-submit-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .submit-btn {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    padding: 10px 20px;
+  }
+  .submit-btn:hover {
+    background-color: #81c784;
+  }
+  .submit-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+  
+  /* Species table styling */
+  .species-table th {
+    background-color: #4caf50;
+    color: white;
+  }
+  .species-table td {
+    text-align: center;
+  }
+  .count-input {
+    max-width: 80px;
+    margin: auto;
+  }
+  

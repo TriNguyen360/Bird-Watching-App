@@ -1,0 +1,81 @@
+[[extend 'layout.html']]
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="/bird_watching_app/static/css/edit_checklists.css" rel="stylesheet">
+
+<div class="container mt-5" id="edit-checklist-app" v-cloak>
+  <!-- Header Section -->
+  <div class="header-section text-center mb-4">
+    <h1 class="app-title">Edit Checklist</h1>
+    <p class="app-subtitle">Modify your bird-watching checklist below.</p>
+    <a href="[[=URL('my_checklists')]]" class="btn btn-secondary">Back to My Checklists</a>
+  </div>
+
+  <!-- Edit Checklist Form -->
+  <div v-if="checklist">
+    <form @submit.prevent="updateChecklist">
+      <div class="mb-3">
+        <label for="observation_date" class="form-label">Observation Date</label>
+        <input type="date" class="form-control" id="observation_date" v-model="checklist.observation_date" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="time_observations_started" class="form-label">Time Observations Started</label>
+        <input type="time" class="form-control" id="time_observations_started" v-model="checklist.time_observations_started" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="latitude" class="form-label">Latitude</label>
+        <input type="number" step="any" class="form-control" id="latitude" v-model="checklist.latitude" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="longitude" class="form-label">Longitude</label>
+        <input type="number" step="any" class="form-control" id="longitude" v-model="checklist.longitude" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="duration_minutes" class="form-label">Duration (minutes)</label>
+        <input type="number" step="any" class="form-control" id="duration_minutes" v-model="checklist.duration_minutes" required>
+      </div>
+
+      <h3 class="mt-4">Sightings</h3>
+      <div v-for="(sighting, index) in checklist.sightings" :key="index" class="sighting-entry mb-3">
+        <div class="row">
+          <div class="col-md-6">
+            <label :for="'species_' + index" class="form-label">Species</label>
+            <select class="form-select" :id="'species_' + index" v-model="sighting.species_id" required>
+              <option v-for="species in species" :key="species.id" :value="species.id">
+                {{ species.common_name }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label :for="'count_' + index" class="form-label">Observation Count</label>
+            <input type="number" min="0" class="form-control" :id="'count_' + index" v-model.number="sighting.observation_count" required>
+          </div>
+        </div>
+      </div>
+      <!-- Removed the "Add Sighting" button -->
+      <!-- <button type="button" class="btn btn-success mt-3" @click="addSighting">Add Sighting</button> -->
+
+      <button type="submit" class="btn btn-primary mt-4">Update Checklist</button>
+    </form>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div v-else-if="isLoading" class="text-center my-4">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading checklist data...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div v-else class="alert alert-danger text-center">
+    <strong>Error:</strong> {{ errorMessage }}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+<script src="/bird_watching_app/static/js/edit_checklists.js"></script>
