@@ -18,14 +18,18 @@
       <p><strong>Selected Location:</strong> {{ location.lat }}, {{ location.lng }}</p>
     </div>
 
-    <!-- Search Species -->
-    <div class="search-section mb-4">
+    <!-- Search and Submit Section -->
+    <div class="search-submit-section mb-4">
       <input 
         type="text" 
         class="form-control search-input" 
         placeholder="Search species..." 
         v-model="searchQuery"
       />
+      <button 
+        class="btn submit-btn" 
+        @click="submitChecklist" 
+        :disabled="!hasSightings">Submit Checklist</button>
     </div>
 
     <!-- Species List -->
@@ -58,14 +62,6 @@
         </tr>
       </tbody>
     </table>
-
-    <!-- Submit Button -->
-    <div class="text-center">
-      <button 
-        class="btn submit-btn" 
-        @click="submitChecklist" 
-        :disabled="!hasSightings">Submit Checklist</button>
-    </div>
   </div>
 
   <!-- Error Message for Missing Location -->
