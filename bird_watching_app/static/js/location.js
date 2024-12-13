@@ -7,37 +7,67 @@ let currentChart = null;
 const locationApp = {
     data() {
         return {
-            regionStats: [
-                { species: "Mordecai", checklists: 15, sightings: 42 },
-                { species: "Rigby", checklists: 10, sightings: 25 },
-                { species: "TheBird", checklists: 5, sightings: 8 },
-            ],
+            regionStats: [],
+            topContributors: [],
             selectedSpecies: null,
-            topContributors: [
-                { name: "Fredrick", contributions: 30 },
-                { name: "Chica", contributions: 20 },
-                { name: "Bonnie", contributions: 15 },
-            ],
+            ne_lat: null,
+            ne_lng: null,
+            sw_lat: null,
+            sw_lng: null,
         };
     },
     methods: {
+        parseURLParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            this.ne_lat = urlParams.get('ne_lat');
+            this.ne_lng = urlParams.get('ne_lng');
+            this.sw_lat = urlParams.get('sw_lat');
+            this.sw_lng = urlParams.get('sw_lng');
+        },
+        loadRegionData() {
+            axios.get('/bird_watching_app/get_region_data', {
+                params: {
+                    ne_lat: this.ne_lat,
+                    ne_lng: this.ne_lng,
+                    sw_lat: this.sw_lat,
+                    sw_lng: this.sw_lng
+                }
+            })
+                .then(response => {
+                    this.regionStats = response.data.region_species;
+                    this.topContributors = response.data.top_contributors;
+                })
+                .catch(error => {
+                    console.error("Error loading region data:", error);
+                });
+        },
         selectSpecies(species) {
             this.selectedSpecies = species;
-            // Used this to help me figure out how to delay chart rendering until DOM updates finish:
-            // https://stackoverflow.com/questions/47634258/what-is-nexttick-and-what-does-it-do-in-vue-js
             this.$nextTick(() => {
-                this.renderChart(species);
+                this.loadSpeciesTimeData(species);
             });
         },
-        renderChart(species) {
-            const data = [
-                { date: "December 7", count: 5 },
-                { date: "December 8", count: 10 },
-                { date: "December 9", count: 8 },
-            ];
-
+        loadSpeciesTimeData(species) {
+            if (!species) return;
+            axios.get('/bird_watching_app/get_species_time_data', {
+                params: {
+                    species: species,
+                    ne_lat: this.ne_lat,
+                    ne_lng: this.ne_lng,
+                    sw_lat: this.sw_lat,
+                    sw_lng: this.sw_lng
+                }
+            })
+                .then(response => {
+                    const data = response.data.time_series;
+                    this.renderChart(species, data);
+                })
+                .catch(error => {
+                    console.error("Error loading species time data:", error);
+                });
+        },
+        renderChart(species, data) {
             const chartContainer = document.getElementById("speciesChart");
-
             if (!chartContainer) {
                 console.error("Canvas element not found.");
                 return;
@@ -45,12 +75,10 @@ const locationApp = {
 
             const ctx = chartContainer.getContext("2d");
 
-            // We get rid of the old chart for the new one.
             if (currentChart) {
                 currentChart.destroy();
             }
 
-            // Create the new chart
             currentChart = new Chart(ctx, {
                 type: "line",
                 data: {
@@ -73,7 +101,8 @@ const locationApp = {
         },
     },
     mounted() {
-        console.log("Location page initialized.");
+        this.parseURLParams();
+        this.loadRegionData();
     },
 };
 

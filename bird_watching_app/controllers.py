@@ -124,20 +124,133 @@ def submit_checklist():
     for entry in data:
         db.sightings.insert(
             species_id=entry['species_id'],
-            observation_count=entry['count'],
+            count=entry['count'],
             latitude=entry['location']['lat'],
             longitude=entry['location']['lng'],
+            user_id=auth.current_user.get('id')
         )
     return dict(status="success")
-
 
 
 @action('my_checklists', method=['GET'])
 @action.uses('my_checklists.html', db, auth.user)
 def my_checklists():
-    # Return sample data for simplicity
-    checklists = [
-        {"id": 1, "date": "2023-12-01", "latitude": 37.7749, "longitude": -122.4194},
-        {"id": 2, "date": "2023-12-02", "latitude": 40.7128, "longitude": -74.0060},
+    return dict(checklists=[])
+
+
+@action('get_region_data', method=['GET'])
+@action.uses(db, auth.user)
+def get_region_data():
+
+    ne_lat = float(request.params.get('ne_lat', 90))
+    ne_lng = float(request.params.get('ne_lng', 180))
+    sw_lat = float(request.params.get('sw_lat', -90))
+    sw_lng = float(request.params.get('sw_lng', -180))
+    
+    # Get all data form checklists database inside the rectangular region
+    # Connect sightings database
+    rows = db(
+        (db.checklists.latitude <= ne_lat) &
+        (db.checklists.latitude >= sw_lat) &
+        (db.checklists.longitude <= ne_lng) &
+        (db.checklists.longitude >= sw_lng)
+    ).select(
+        db.checklists.sampling_event_identifier,
+        db.checklists.observer_id,
+        db.sightings.common_name,
+        db.sightings.observation_count,
+        join=db.sightings.on(db.sightings.sampling_event_identifier == db.checklists.sampling_event_identifier)
+    )
+
+    species_stats = {} 
+
+    contributor_counts = {}
+
+    observer_checklists = {}
+
+    for row in rows:
+        species = row.sightings.common_name
+        count = row.sightings.observation_count or 0
+        observer = row.checklists.observer_id
+        sei = row.checklists.sampling_event_identifier
+
+        if species not in species_stats:
+            species_stats[species] = 0
+        species_stats[species] += count
+
+        if observer not in observer_checklists:
+            observer_checklists[observer] = set()
+        observer_checklists[observer].add(sei)
+
+    for obs, checklist_set in observer_checklists.items():
+        contributor_counts[obs] = len(checklist_set)
+
+    region_species_data = [
+        {
+            'species': s,
+            'sightings': species_stats[s]
+        }
+        for s in species_stats
     ]
-    return dict(checklists=checklists)
+
+    # Prepares species data and cleans up 0 sighted data
+    region_species_data = [
+        {
+            'species': s,
+            'sightings': species_stats[s]
+        }
+        for s in species_stats
+        if species_stats[s] > 0
+    ]
+    region_species_data.sort(key=lambda x: x['sightings'], reverse=True)
+
+    # Prepares top contributors data and sorting
+    top_contributors = [
+        {
+            'name': obs,
+            'contributions': contributor_counts[obs]
+        }
+        for obs in contributor_counts
+    ]
+    top_contributors.sort(key=lambda x: x['contributions'], reverse=True)
+
+
+    return dict(
+        region_species=region_species_data,
+        top_contributors=top_contributors
+    )
+
+
+@action('get_species_time_data', method=['GET'])
+@action.uses(db, auth.user)
+def get_species_time_data():
+
+    ne_lat = float(request.params.get('ne_lat', 90))
+    ne_lng = float(request.params.get('ne_lng', 180))
+    sw_lat = float(request.params.get('sw_lat', -90))
+    sw_lng = float(request.params.get('sw_lng', -180))
+    species_name = request.params.get('species')
+
+
+    rows = db(
+        (db.checklists.latitude <= ne_lat) &
+        (db.checklists.latitude >= sw_lat) &
+        (db.checklists.longitude <= ne_lng) &
+        (db.checklists.longitude >= sw_lng) &
+        (db.sightings.sampling_event_identifier == db.checklists.sampling_event_identifier) &
+        (db.sightings.common_name == species_name)
+    ).select(db.checklists.observation_date, db.sightings.observation_count)
+
+    time_data = {}
+    for row in rows:
+        date_str = row.checklists.observation_date.isoformat()
+        if date_str not in time_data:
+            time_data[date_str] = 0
+        time_data[date_str] += row.sightings.observation_count
+
+    time_series = [
+        {'date': d, 'count': time_data[d]} 
+        for d in sorted(time_data.keys())
+    ]
+
+    return dict(time_series=time_series)
