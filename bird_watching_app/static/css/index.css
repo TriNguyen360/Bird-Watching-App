@@ -39,18 +39,18 @@ body {
     margin-bottom: 2em; 
 }
 
-.page-navbar navbar-menu {
+.page-navbar .navbar-menu {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.page-navbar navbar-items {
+.page-navbar .navbar-items {
     display: flex;
     gap: 20px;
 }
 
-.page-navbar navbar-item {
+.page-navbar .navbar-item {
     color: white;
     font-weight: bold;
     padding: 0.5rem 1rem;
@@ -59,7 +59,7 @@ body {
     text-decoration: none;
 }
 
-.page-navebar navbar-item:hover {
+.page-navebar .navbar-item:hover {
     background-color: #81c784;
     transform: scale(1.05);
     color: white;
@@ -223,11 +223,11 @@ body {
         gap: 10px;
     }
     
-    .navbar-menu {
+    .page-navbar .navbar-menu {
         justify-content: center;
     }
     
-    .navbar-items {
+    .page-navbar .navbar-items {
         flex-direction: column;
         gap: 10px;
     }
