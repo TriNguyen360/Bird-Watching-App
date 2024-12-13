@@ -1,34 +1,45 @@
-/* General Styles */
+/* General styling */
 body {
-    background-color: #f4f9f4;
-  }
-  
-  h1 {
-    color: #4caf50;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-  }
-  
-  th {
-    background-color: #81c784;
-    color: white;
-    text-align: center;
-  }
-  
-  td {
-    text-align: center;
-  }
-  
-  button {
-    margin: 0 5px;
-  }
-  
-  .alert {
-    background-color: #e8f5e9;
-    color: #388e3c;
-  }
-  
+  background-color: #f4f9f4;
+}
+
+/* Header section */
+.header-section {
+  margin-bottom: 20px;
+}
+.app-title {
+  font-size: 2rem;
+  color: #4caf50;
+}
+.app-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+}
+.btn-primary {
+  background-color: #4caf50;
+  border: none;
+  font-weight: bold;
+  border-radius: 25px;
+}
+.btn-primary:hover {
+  background-color: #81c784;
+}
+
+/* Table styling */
+.table th {
+  background-color: #4caf50;
+  color: white;
+}
+.table td {
+  text-align: center;
+}
+.btn-sm {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Alerts */
+.alert-info {
+  border-radius: 10px;
+  font-weight: bold;
+}
