@@ -115,3 +115,25 @@ def region_stats():
         species_stats[species] += count
 
     return dict(stats=species_stats)
+
+
+@action('submit_checklist', method=['POST'])
+@action.uses(db, auth.user)
+def submit_checklist():
+    data = request.json.get('checklist', [])
+    for entry in data:
+        db.sightings.insert(
+            species_id=entry['species_id'],
+            count=entry['count'],
+            latitude=entry['location']['lat'],
+            longitude=entry['location']['lng'],
+            user_id=auth.current_user.get('id')
+        )
+    return dict(status="success")
+
+
+@action('my_checklists', method=['GET'])
+@action.uses('my_checklists.html', db, auth.user)
+def my_checklists():
+    return dict(checklists=[])
+
