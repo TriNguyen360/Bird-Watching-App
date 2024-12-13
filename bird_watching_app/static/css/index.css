@@ -205,7 +205,8 @@ body {
     text-align: center;
     color: #555;
     font-size: 0.9rem;
-    margin-top: 0.5em;
+    margin-top: 0.1em;
+    margin-bottom: -0.2em;
     font-style: italic;
 }
 

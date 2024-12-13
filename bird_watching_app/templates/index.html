@@ -65,7 +65,8 @@
   <div id="map" style="height: 500px; width: 100%;"></div>
 
   <!-- Instructional Text -->
-  <p class="map-instruction">Right-click on the map to delete a marker / Use the rectangle drawing tool to view statistics on a location</p>
+  <p class="map-instruction">Left-click on the map using the "Pan Tool" to add marker to submit a Checklist / Right-click on the map to delete marker</p>
+  <p class="map-instruction">Use the "Rectangle Drawing Tool" to view statistics on a location</p>  
 
   <!-- Buttons to redirect to location, delete rectangle, submit a checklist -->
   <div class="buttons" style="margin-top: 1em; display: flex; justify-content: space-between; align-items: center;">
@@ -84,7 +85,7 @@
         :disabled="!has_region_rectangle"
         @click="deleteRegionRectangle"
         style="margin-right: 10px;">
-        Delete region
+        Clear region rectangle
       </button>
     </div>
   
